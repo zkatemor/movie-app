@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.Toolbar
+        android:id="@+id/main_toolbar"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+            android:id="@+id/edit_text_layout"
+            android:layout_gravity="center"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/toolbar_main"
+            android:layout_width="344dp"
+            android:layout_height="40dp">
+
+        <ImageView
+                android:id="@+id/image_view_city"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_gravity="center_vertical"
+                app:srcCompat="@drawable/ic_search"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:layout_gravity="center"
+                android:fontFamily="sans-serif"
+                android:layout_marginLeft="27.5dp"
+                android:textStyle="normal"
+                android:lineSpacingExtra="5sp"
+                tools:text="Поиск по названию фильма"
+        />
+
+    </LinearLayout>
+
+</android.support.v7.widget.Toolbar>
