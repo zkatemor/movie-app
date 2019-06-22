@@ -6,8 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        xmlns:tools="http://schemas.android.com/tools">
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
     <LinearLayout
             android:id="@+id/edit_text_layout"
@@ -27,6 +26,7 @@
                 app:srcCompat="@drawable/ic_search"/>
 
         <TextView
+                android:id="@+id/edit_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
@@ -34,7 +34,7 @@
                 android:textColor="@color/colorBlack__38"
                 android:fontFamily="sans-serif"
                 android:layout_marginLeft="27.5dp"
-                tools:text="Поиск по названию фильма"
+                android:text="Поиск по названию фильма"
         />
 
     </LinearLayout>

@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Movies</string>
     <string name="toolbar_edit_text">Поиск по названию фильма</string>
+    <string name="API_key">6ccd72a2a8fc239b13f209408fc31c33</string>
 </resources>

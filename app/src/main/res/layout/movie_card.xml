@@ -17,7 +17,8 @@
     <ImageView
             android:id="@+id/image_view_movie"
             android:background="@drawable/default_image"
-            android:layout_width="119dp"
+            android:layout_width="120dp"
+            android:scaleType="fitXY"
             android:layout_height="match_parent"/>
 
     <LinearLayout
@@ -31,20 +32,23 @@
         <TextView
                 style="@style/TextStyle"
                 android:id="@+id/movie_name"
-                android:layout_width="193dp"
-                android:layout_height="56dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:maxLines="2"
+                android:layout_marginBottom="8dp"
                 tools:text="Бегущий по лезвию 2049"/>
 
         <TextView
                 android:id="@+id/movie_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:textSize="14sp"
                 android:lines="3"
+                android:layout_marginTop="8dp"
                 android:fontFamily="sans-serif"
                 android:textStyle="normal"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@color/colorBlack__54"
                 android:lineSpacingExtra="6sp"
                 tools:text="Отставной детектив Рик Декард вновь восстановлен в полиции Лос-Анджелеса для поиска возглавляемой Роем Батти группы киборгов, совершившей побег из космической колонии на Землю."
         />
@@ -54,6 +58,7 @@
                 android:layout_gravity="bottom"
                 android:orientation="horizontal"
                 android:layout_marginTop="19dp"
+                android:layout_marginBottom="16dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
@@ -66,22 +71,21 @@
 
             <TextView
                     android:id="@+id/text_date"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
                     android:fontFamily="sans-serif"
                     android:textStyle="normal"
-                    android:textColor="@color/colorPrimary"
+                    android:textColor="@color/colorBlack__54"
                     tools:text="1 января 2017"/>
 
             <ImageView
                     android:id="@+id/icon_heart"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="93dp"
                     android:layout_gravity="center_vertical"
                     app:srcCompat="@drawable/ic_heart"/>
-
 
         </LinearLayout>
 

@@ -1,6 +1,8 @@
 package com.zkatemor.movies.model
 
-class Movie {
+import java.io.Serializable
+
+class Movie : @Transient Serializable {
     private var id: Int = 0
     private var name: String = ""
     private var description: String = ""
