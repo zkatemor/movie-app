@@ -1,6 +1,5 @@
 package com.zkatemor.movies.activity
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -17,7 +16,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 import javax.inject.Named
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
     @Inject
     @Named("Movies_Repository")
     lateinit var repository: MoviesRepository
@@ -41,7 +40,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initializeData() {
-       // invisibleErrorLayout()
         visibleProgress()
         isLoadData = true
         addMovies()
@@ -105,21 +103,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initializeSwipeRefreshLayoutListener() {
-        visibleProgress()
-
         swipe_refresh_layout.setOnRefreshListener {
-                movies = ArrayList()
-                page = 1
-                initializeData()
+            movies = ArrayList()
+            page = 1
+            isLoadData = true
+            addMovies()
         }
     }
 
     private fun invisibleProgress() {
         swipe_refresh_layout.isRefreshing = false
-       // progress_bar_layout.visibility = View.INVISIBLE
+        main_progress_bar.visibility = View.INVISIBLE
     }
 
     private fun visibleProgress() {
-       // progress_bar_layout.visibility = View.VISIBLE
+        main_progress_bar.visibility = View.VISIBLE
     }
 }
