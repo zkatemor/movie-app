@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.Toolbar
-        android:id="@+id/main_toolbar"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/main_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-    <LinearLayout
+    <RelativeLayout
             android:id="@+id/edit_text_layout"
             android:layout_gravity="center"
             android:background="@drawable/tool_bar_layout"
@@ -25,18 +25,35 @@
                 android:layout_gravity="center_vertical"
                 app:srcCompat="@drawable/ic_search"/>
 
-        <TextView
-                android:id="@+id/edit_text_view"
+        <ViewSwitcher
+                android:id="@+id/view_switcher"
+                android:foregroundGravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:layout_gravity="center"
-                android:textColor="@color/colorBlack__38"
-                android:fontFamily="sans-serif"
-                android:layout_marginLeft="27.5dp"
-                android:text="Поиск по названию фильма"
-        />
+                android:layout_marginStart="28dp"
+                android:layout_alignStart="@+id/image_view_city">
 
-    </LinearLayout>
+            <TextView
+                    android:id="@+id/clickable_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:layout_gravity="center"
+                    android:textColor="@color/colorBlack__38"
+                    android:fontFamily="sans-serif"
+                    android:text="Поиск по названию фильма"/>
+
+            <EditText
+                    android:id="@+id/edit_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:textColor="@color/colorBlack__38"
+                    android:fontFamily="sans-serif"
+                    android:imeOptions="actionSearch"
+                    android:text="Поиск по названию фильма"/>
+        </ViewSwitcher>
+
+    </RelativeLayout>
 
 </android.support.v7.widget.Toolbar>

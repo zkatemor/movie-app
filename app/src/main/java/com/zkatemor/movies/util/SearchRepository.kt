@@ -1,17 +1,17 @@
 package com.zkatemor.movies.util
 
 import com.zkatemor.movies.network.MoviesResponse
-import com.zkatemor.movies.network.MoviesService
 import com.zkatemor.movies.network.ResponseCallback
+import com.zkatemor.movies.network.SearchService
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import javax.inject.Inject
 
-class MoviesRepository @Inject constructor(private val moviesApi: MoviesService) {
-    fun getMovies(responseCallback: ResponseCallback<MoviesResponse>, page: Int) {
+class SearchRepository @Inject constructor(private val searchApi: SearchService) {
+    fun searchMovies(responseCallback: ResponseCallback<MoviesResponse>, query: String) {
         //retrofit async
-        moviesApi.getMovies(page)
+        searchApi.searchMovies(query)
             .enqueue(object : Callback<MoviesResponse> {
 
                 override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {

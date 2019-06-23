@@ -1,7 +1,6 @@
 package com.zkatemor.movies.network
 
 import com.google.gson.annotations.SerializedName
-import com.zkatemor.movies.model.Movie
 
 interface ApiResponse
 

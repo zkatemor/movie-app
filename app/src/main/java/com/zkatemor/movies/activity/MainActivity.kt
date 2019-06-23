@@ -3,6 +3,8 @@ package com.zkatemor.movies.activity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
+import android.view.Gravity
 import android.view.View
 import com.zkatemor.movies.R
 import com.zkatemor.movies.adapter.MovieAdapter
@@ -11,22 +13,32 @@ import com.zkatemor.movies.model.Movie
 import com.zkatemor.movies.network.MoviesResponse
 import com.zkatemor.movies.network.ResponseCallback
 import com.zkatemor.movies.util.MoviesRepository
+import com.zkatemor.movies.util.SearchRepository
 import com.zkatemor.movies.util.Tools
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.toolbar_main.*
 import javax.inject.Inject
 import javax.inject.Named
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
 
 class MainActivity : BaseActivity() {
     @Inject
     @Named("Movies_Repository")
     lateinit var repository: MoviesRepository
 
+    @Inject
+    @Named("Search_Repository")
+    lateinit var search_repository: SearchRepository
+
     private val DIRECTION_UP: Int = -1
     private val BASE_IMAGE_URL: String = "https://image.tmdb.org/t/p/w500/"
 
     private var movies: ArrayList<Movie> = ArrayList()
+    private var search_movies: ArrayList<Movie> = ArrayList()
     private var page : Int = 1
     private var isLoadData: Boolean = true
+    private var movie: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,8 +47,10 @@ class MainActivity : BaseActivity() {
         initializeScrollListenerOnRecView(LinearLayoutManager(this))
 
         App.component!!.injectsMainActivity(this)
-        initializeData()
         initializeSwipeRefreshLayoutListener()
+
+      /*  movie = "человек паук"
+        searchMovies()*/
     }
 
     private fun initializeData() {
@@ -70,8 +84,38 @@ class MainActivity : BaseActivity() {
             , page)
     }
 
+    private fun searchMovies() {
+        search_repository.searchMovies(object : ResponseCallback<MoviesResponse> {
+            override fun onSuccess(apiResponse: MoviesResponse) {
+                apiResponse.movies.forEach {
+                    search_movies.add(
+                        Movie(it.id, it.name, it.description, Tools.convertDate(it.date), BASE_IMAGE_URL + it.imageURL)
+                    )
+                }
+                setFindDataOnRecView()
+                isLoadData = false
+            }
+
+            override fun onFailure(errorMessage: String) {
+                isLoadData = false
+            }
+        }
+            , movie)
+    }
+
     private fun setDataOnRecView() {
         val adapter = MovieAdapter(movies, this)
+        val manager = LinearLayoutManager(this)
+        rec_view_movie_card.layoutManager = manager
+        rec_view_movie_card.adapter = adapter
+
+        invisibleProgress()
+
+        initializeScrollListenerOnRecView(manager)
+    }
+
+    private fun setFindDataOnRecView() {
+        val adapter = MovieAdapter(search_movies, this)
         val manager = LinearLayoutManager(this)
         rec_view_movie_card.layoutManager = manager
         rec_view_movie_card.adapter = adapter
