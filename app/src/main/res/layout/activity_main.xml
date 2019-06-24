@@ -5,6 +5,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/main_layout"
         android:layout_width="match_parent"
+        android:background="@color/colorPrimary"
         android:layout_height="match_parent"
         tools:context=".activity.MainActivity">
 
@@ -20,14 +21,9 @@
 
         <android.support.v4.widget.SwipeRefreshLayout
                 android:id="@+id/swipe_refresh_layout"
+                android:background="@color/colorPrimary"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-
-            <android.support.design.widget.CoordinatorLayout
-                    android:id="@+id/layout_coordinator"
-                    android:background="@color/colorPrimary"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
 
                 <android.support.v7.widget.RecyclerView
                         android:id="@+id/rec_view_movie_card"
@@ -37,11 +33,55 @@
                         app:layoutManager="android.support.v7.widget.LinearLayoutManager"
                         tools:itemCount="20"/>
 
-            </android.support.design.widget.CoordinatorLayout>
-
         </android.support.v4.widget.SwipeRefreshLayout>
 
     </LinearLayout>
+
+    <RelativeLayout
+            android:id="@+id/error_layout"
+            android:visibility="invisible"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <LinearLayout
+                android:id="@+id/linear_error_layout"
+                android:layout_width="wrap_content"
+                android:orientation="vertical"
+                android:layout_centerInParent="true"
+                android:layout_height="wrap_content">
+
+            <ImageView
+                    android:id="@+id/error_image_view"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/ic_alert_triangle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            <TextView
+                    android:id="@+id/error_text_view"
+                    android:layout_width="249dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif"
+                    android:textStyle="normal"
+                    android:textColor="#b4b4b4"
+                    android:textAlignment="center"
+                    android:lineSpacingExtra="10sp"
+                    android:gravity="center_horizontal"
+                    android:text="Нам не удалось обработать ваш запрос. Попробуйте еще раз"
+                    android:layout_marginTop="33dp"/>
+
+        </LinearLayout>
+
+        <ImageView
+                android:id="@+id/update_image_view"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentBottom="true"
+                app:srcCompat="@drawable/ic_fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:layout_marginBottom="14dp"/>
+
+    </RelativeLayout>
 
     <ProgressBar
             android:id="@+id/main_progress_bar"

@@ -3,8 +3,7 @@ package com.zkatemor.movies.activity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
-import android.view.Gravity
+import android.view.KeyEvent
 import android.view.View
 import com.zkatemor.movies.R
 import com.zkatemor.movies.adapter.MovieAdapter
@@ -16,11 +15,10 @@ import com.zkatemor.movies.util.MoviesRepository
 import com.zkatemor.movies.util.SearchRepository
 import com.zkatemor.movies.util.Tools
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.toolbar_main.*
 import javax.inject.Inject
 import javax.inject.Named
-import android.view.inputmethod.EditorInfo
-import android.widget.TextView
+import android.widget.Toast
+import kotlinx.android.synthetic.main.toolbar_main.*
 
 class MainActivity : BaseActivity() {
     @Inject
@@ -36,8 +34,9 @@ class MainActivity : BaseActivity() {
 
     private var movies: ArrayList<Movie> = ArrayList()
     private var search_movies: ArrayList<Movie> = ArrayList()
-    private var page : Int = 1
+    private var page: Int = 1
     private var isLoadData: Boolean = true
+    private var isSearch: Boolean = false
     private var movie: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,16 +46,20 @@ class MainActivity : BaseActivity() {
         initializeScrollListenerOnRecView(LinearLayoutManager(this))
 
         App.component!!.injectsMainActivity(this)
+
+        initializeData()
+
         initializeSwipeRefreshLayoutListener()
 
-      /*  movie = "человек паук"
-        searchMovies()*/
+        setOnClickUpdateButton()
     }
 
     private fun initializeData() {
+        invisibleErrorLayout()
         visibleProgress()
         isLoadData = true
-        addMovies()
+        if (!isSearch) addMovies()
+        else searchMovies()
     }
 
     private fun addMovies() {
@@ -67,18 +70,23 @@ class MainActivity : BaseActivity() {
 
                 apiResponse.movies.forEach {
                     movies.add(
-                        Movie(it.id, it.name, it.description, Tools.convertDate(it.date), BASE_IMAGE_URL + it.imageURL)
+                        Movie(
+                            it.id, it.name, it.description, Tools.convertDate(it.date),
+                            BASE_IMAGE_URL + it.imageURL, false
+                        )
                     )
                 }
                 if (page > 1) {
                     rec_view_movie_card.adapter!!.notifyItemInserted(movies.size - 1)
                 } else
-                    setDataOnRecView()
+                    setDataOnRecView(movies)
                 isLoadData = false
+                isSearch = false
             }
 
             override fun onFailure(errorMessage: String) {
                 isLoadData = false
+                visibleErrorLayout()
             }
         }
             , page)
@@ -89,40 +97,61 @@ class MainActivity : BaseActivity() {
             override fun onSuccess(apiResponse: MoviesResponse) {
                 apiResponse.movies.forEach {
                     search_movies.add(
-                        Movie(it.id, it.name, it.description, Tools.convertDate(it.date), BASE_IMAGE_URL + it.imageURL)
+                        Movie(
+                            it.id, it.name, it.description, Tools.convertDate(it.date),
+                            BASE_IMAGE_URL + it.imageURL, false
+                        )
                     )
                 }
-                setFindDataOnRecView()
-                isLoadData = false
+
+                if (search_movies.count() >= 1) {
+                    setDataOnRecView(search_movies)
+                    isLoadData = false
+                    isSearch = true
+                } else {
+
+                }
             }
 
             override fun onFailure(errorMessage: String) {
                 isLoadData = false
+                visibleErrorLayout()
             }
         }
             , movie)
     }
 
-    private fun setDataOnRecView() {
-        val adapter = MovieAdapter(movies, this)
-        val manager = LinearLayoutManager(this)
-        rec_view_movie_card.layoutManager = manager
-        rec_view_movie_card.adapter = adapter
-
+    private fun visibleErrorLayout() {
+        error_layout.visibility = View.VISIBLE
+        linear_layout.visibility = View.INVISIBLE
         invisibleProgress()
-
-        initializeScrollListenerOnRecView(manager)
     }
 
-    private fun setFindDataOnRecView() {
-        val adapter = MovieAdapter(search_movies, this)
+    private fun invisibleErrorLayout() {
+        invisibleProgress()
+        linear_layout.visibility = View.VISIBLE
+        error_layout.visibility = View.INVISIBLE
+    }
+
+    private fun setDataOnRecView(data: ArrayList<Movie>) {
+        val adapter = MovieAdapter(data)
         val manager = LinearLayoutManager(this)
         rec_view_movie_card.layoutManager = manager
         rec_view_movie_card.adapter = adapter
 
+        adapter.onItemClick = { movie ->
+            val toast = Toast.makeText(
+                this,
+                movie.getName, Toast.LENGTH_SHORT
+            )
+            toast.show()
+        }
+
         invisibleProgress()
 
         initializeScrollListenerOnRecView(manager)
+
+        initializeSearchEditText()
     }
 
     private fun initializeScrollListenerOnRecView(manager: LinearLayoutManager) {
@@ -135,7 +164,7 @@ class MainActivity : BaseActivity() {
                 val countGeneral = manager.itemCount
                 val firstPosition = manager.findFirstVisibleItemPosition()
 
-                if (!isLoadData /*&& isInternetAccess*/) {
+                if (!isLoadData) {
                     if ((countVisible + firstPosition) >= countGeneral) {
                         page++
                         isLoadData = true
@@ -146,12 +175,33 @@ class MainActivity : BaseActivity() {
         })
     }
 
+    private fun initializeSearchEditText() {
+        setSupportActionBar(main_toolbar)
+
+        search_bar_edit_text.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
+                search_movies = ArrayList()
+                movie = search_bar_edit_text.text.toString()
+                searchMovies()
+                return@OnKeyListener true
+            }
+            false
+        })
+    }
+
     private fun initializeSwipeRefreshLayoutListener() {
         swipe_refresh_layout.setOnRefreshListener {
             movies = ArrayList()
             page = 1
             isLoadData = true
-            addMovies()
+            initializeData()
+        }
+    }
+
+    private fun setOnClickUpdateButton() {
+        update_image_view.setOnClickListener {
+            initializeData()
+            invisibleProgress()
         }
     }
 
@@ -162,5 +212,15 @@ class MainActivity : BaseActivity() {
 
     private fun visibleProgress() {
         main_progress_bar.visibility = View.VISIBLE
+    }
+
+    override fun onBackPressed() {
+        if (isSearch) {
+            isSearch = false
+            movie = ""
+            search_bar_edit_text.text.clear()
+            initializeData()
+        } else
+            super.onBackPressed()
     }
 }

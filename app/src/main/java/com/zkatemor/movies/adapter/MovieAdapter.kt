@@ -1,6 +1,5 @@
 package com.zkatemor.movies.adapter
 
-import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -12,8 +11,9 @@ import com.bumptech.glide.Glide
 import com.zkatemor.movies.R
 import com.zkatemor.movies.model.Movie
 
-class MovieAdapter (private val items: ArrayList<Movie>, context: Context)
-    : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>(){
+class MovieAdapter(private val items: ArrayList<Movie>) : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
+
+    var onItemClick: ((Movie) -> Unit)? = null
 
     override fun getItemCount(): Int {
         return items.size
@@ -21,8 +21,11 @@ class MovieAdapter (private val items: ArrayList<Movie>, context: Context)
 
     override fun onCreateViewHolder(viewHolder: ViewGroup, position: Int): MovieViewHolder {
         return MovieViewHolder(
-            LayoutInflater.from(viewHolder.context).inflate(R.layout.movie_card,
-                viewHolder, false))
+            LayoutInflater.from(viewHolder.context).inflate(
+                R.layout.movie_card,
+                viewHolder, false
+            )
+        )
     }
 
     override fun onBindViewHolder(viewHolder: MovieViewHolder, position: Int) {
@@ -31,7 +34,10 @@ class MovieAdapter (private val items: ArrayList<Movie>, context: Context)
         viewHolder.name.text = item.getName
         viewHolder.description.text = item.getDescription
 
-        viewHolder.date.text = item.getDate
+        if (item.getDate != "")
+            viewHolder.date.text = item.getDate
+        else
+            viewHolder.date.text = "дата неизвестна"
 
         Glide.with(viewHolder.main_layout).load(item.getImageURL).into(viewHolder.image)
     }
@@ -42,6 +48,7 @@ class MovieAdapter (private val items: ArrayList<Movie>, context: Context)
         var description: TextView
         var date: TextView
         var image: ImageView
+        var icon_heart: ImageView
 
         init {
             super.itemView
@@ -50,6 +57,11 @@ class MovieAdapter (private val items: ArrayList<Movie>, context: Context)
             description = itemView.findViewById(R.id.movie_description) as TextView
             date = itemView.findViewById(R.id.text_date) as TextView
             image = itemView.findViewById(R.id.image_view_movie) as ImageView
+            icon_heart = itemView.findViewById(R.id.icon_heart) as ImageView
+
+            itemView.setOnClickListener {
+                onItemClick?.invoke(items[adapterPosition])
+            }
         }
     }
 }

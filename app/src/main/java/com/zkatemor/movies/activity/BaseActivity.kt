@@ -5,6 +5,7 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import com.zkatemor.movies.util.ConnectivityReceiver
 import com.zkatemor.movies.util.SnackBar
 import kotlinx.android.synthetic.main.activity_main.*

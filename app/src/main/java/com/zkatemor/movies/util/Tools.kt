@@ -12,13 +12,13 @@ class Tools {
             var year = ""
 
 
-            if (sDate != null) {
+            if (sDate != "") {
                 month += sDate!!.substring(5, 7)
                 day += sDate!!.substring(8)
                 year += sDate!!.substring(0, 4)
             }
 
-            if (sDate != null) {
+            if (sDate != "") {
                 result += day.toInt().toString()
                 result += " " + DateFormatSymbols().getMonths()[month.toInt() - 1]
                 result += " " + year.toInt().toString()
