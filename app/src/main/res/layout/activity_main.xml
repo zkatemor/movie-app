@@ -9,15 +9,23 @@
         android:layout_height="match_parent"
         tools:context=".activity.MainActivity">
 
+    <include
+            android:id="@+id/toolbar_main"
+            layout="@layout/toolbar_main"/>
+
     <LinearLayout
             android:id="@+id/linear_layout"
+            android:layout_marginTop="52dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-        <include
-                android:id="@+id/toolbar_main"
-                layout="@layout/toolbar_main"/>
+        <ProgressBar
+                android:id="@+id/search_pbar"
+                style="@style/search_progress_bar_style"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:indeterminate="true" />
 
         <android.support.v4.widget.SwipeRefreshLayout
                 android:id="@+id/swipe_refresh_layout"
@@ -80,6 +88,43 @@
                 app:srcCompat="@drawable/ic_fab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" android:layout_marginBottom="14dp"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+            android:id="@+id/not_found_layout"
+            android:visibility="invisible"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <LinearLayout
+                android:id="@+id/linear_not_found_layout"
+                android:layout_width="wrap_content"
+                android:orientation="vertical"
+                android:layout_centerInParent="true"
+                android:layout_height="wrap_content">
+
+            <ImageView
+                    android:id="@+id/not_found_image_view"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/ic_big_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            <TextView
+                    android:id="@+id/not_found_text_view"
+                    android:layout_width="249dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif"
+                    android:textStyle="normal"
+                    android:textColor="#b4b4b4"
+                    android:textAlignment="center"
+                    android:lineSpacingExtra="10sp"
+                    android:gravity="center_horizontal"
+                    android:layout_marginTop="33dp"/>
+
+        </LinearLayout>
 
     </RelativeLayout>
 

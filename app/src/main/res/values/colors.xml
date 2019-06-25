@@ -8,4 +8,5 @@
     <color name="colorBlack__38">#61000000</color>
     <color name="colorBlack__54">#8b000000</color>
     <color name="colorSnackBar">#323232</color>
+    <color name="colorBackProgress">#346c97</color>
 </resources>

@@ -42,24 +42,24 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         initializeScrollListenerOnRecView(LinearLayoutManager(this))
 
         App.component!!.injectsMainActivity(this)
-
         initializeData()
 
         initializeSwipeRefreshLayoutListener()
 
         setOnClickUpdateButton()
+
+        initializeSearchEditText()
     }
 
     private fun initializeData() {
+        invisibleNotFoundLayout()
         invisibleErrorLayout()
         visibleProgress()
         isLoadData = true
-        if (!isSearch) addMovies()
-        else searchMovies()
+        addData()
     }
 
     private fun addMovies() {
@@ -103,13 +103,11 @@ class MainActivity : BaseActivity() {
                         )
                     )
                 }
-
                 if (search_movies.count() >= 1) {
                     setDataOnRecView(search_movies)
                     isLoadData = false
-                    isSearch = true
                 } else {
-
+                    visibleNotFoundLayout()
                 }
             }
 
@@ -133,6 +131,19 @@ class MainActivity : BaseActivity() {
         error_layout.visibility = View.INVISIBLE
     }
 
+    private fun visibleNotFoundLayout() {
+        not_found_layout.visibility = View.VISIBLE
+        linear_layout.visibility = View.INVISIBLE
+        not_found_text_view.text = "По запросу “" + movie + "” ничего не найдено"
+        invisibleProgress()
+    }
+
+    private fun invisibleNotFoundLayout() {
+        invisibleProgress()
+        linear_layout.visibility = View.VISIBLE
+        not_found_layout.visibility = View.INVISIBLE
+    }
+
     private fun setDataOnRecView(data: ArrayList<Movie>) {
         val adapter = MovieAdapter(data)
         val manager = LinearLayoutManager(this)
@@ -147,11 +158,9 @@ class MainActivity : BaseActivity() {
             toast.show()
         }
 
-        invisibleProgress()
-
         initializeScrollListenerOnRecView(manager)
 
-        initializeSearchEditText()
+        invisibleProgress()
     }
 
     private fun initializeScrollListenerOnRecView(manager: LinearLayoutManager) {
@@ -164,15 +173,22 @@ class MainActivity : BaseActivity() {
                 val countGeneral = manager.itemCount
                 val firstPosition = manager.findFirstVisibleItemPosition()
 
-                if (!isLoadData) {
+                if (!isLoadData && !isSearch){
                     if ((countVisible + firstPosition) >= countGeneral) {
                         page++
                         isLoadData = true
-                        addMovies()
+                        addData()
                     }
                 }
             }
         })
+    }
+
+    private fun addData(){
+        if (isSearch)
+        searchMovies()
+        else
+        addMovies()
     }
 
     private fun initializeSearchEditText() {
@@ -182,7 +198,8 @@ class MainActivity : BaseActivity() {
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
                 search_movies = ArrayList()
                 movie = search_bar_edit_text.text.toString()
-                searchMovies()
+                isSearch = true
+                initializeData()
                 return@OnKeyListener true
             }
             false
@@ -191,10 +208,14 @@ class MainActivity : BaseActivity() {
 
     private fun initializeSwipeRefreshLayoutListener() {
         swipe_refresh_layout.setOnRefreshListener {
-            movies = ArrayList()
+            if (isSearch)
+                search_movies = ArrayList()
+            else
+                movies = ArrayList()
+            visibleProgress()
             page = 1
             isLoadData = true
-            initializeData()
+            addData()
         }
     }
 
@@ -207,11 +228,15 @@ class MainActivity : BaseActivity() {
 
     private fun invisibleProgress() {
         swipe_refresh_layout.isRefreshing = false
+        search_pbar.visibility = View.INVISIBLE
         main_progress_bar.visibility = View.INVISIBLE
     }
 
     private fun visibleProgress() {
-        main_progress_bar.visibility = View.VISIBLE
+        if (movies.count() >= 1 || search_movies.count() >= 1)
+            search_pbar.visibility = View.VISIBLE
+        else
+            main_progress_bar.visibility = View.VISIBLE
     }
 
     override fun onBackPressed() {
