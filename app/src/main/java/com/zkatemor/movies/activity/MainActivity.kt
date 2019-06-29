@@ -2,7 +2,6 @@ package com.zkatemor.movies.activity
 
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.KeyEvent
 import android.view.View
 import com.zkatemor.movies.R
@@ -11,14 +10,13 @@ import com.zkatemor.movies.app.App
 import com.zkatemor.movies.model.Movie
 import com.zkatemor.movies.network.MoviesResponse
 import com.zkatemor.movies.network.ResponseCallback
-import com.zkatemor.movies.util.MoviesRepository
-import com.zkatemor.movies.util.SearchRepository
-import com.zkatemor.movies.util.Tools
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 import javax.inject.Named
 import android.widget.Toast
+import com.zkatemor.movies.util.*
 import kotlinx.android.synthetic.main.toolbar_main.*
+import java.io.Serializable
 
 class MainActivity : BaseActivity() {
     @Inject
@@ -29,12 +27,13 @@ class MainActivity : BaseActivity() {
     @Named("Search_Repository")
     lateinit var search_repository: SearchRepository
 
-    private val DIRECTION_UP: Int = -1
+    lateinit var adapter: MovieAdapter
+
     private val BASE_IMAGE_URL: String = "https://image.tmdb.org/t/p/w500/"
+    private val MOVIES_KEY = "movies"
 
     private var movies: ArrayList<Movie> = ArrayList()
     private var search_movies: ArrayList<Movie> = ArrayList()
-    private var page: Int = 1
     private var isLoadData: Boolean = true
     private var isSearch: Boolean = false
     private var movie: String = ""
@@ -42,9 +41,9 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        initializeScrollListenerOnRecView(LinearLayoutManager(this))
 
         App.component!!.injectsMainActivity(this)
+
         initializeData()
 
         initializeSwipeRefreshLayoutListener()
@@ -52,6 +51,37 @@ class MainActivity : BaseActivity() {
         setOnClickUpdateButton()
 
         initializeSearchEditText()
+
+        initializeData()
+    }
+
+    public override fun onSaveInstanceState(savedInstanceState: Bundle) {
+        savedInstanceState.clear()
+        savedInstanceState.putSerializable(MOVIES_KEY, movies as Serializable)
+        super.onSaveInstanceState(savedInstanceState)
+    }
+
+    private fun initializeAdapter(data: ArrayList<Movie>) {
+        adapter = MovieAdapter(data)
+        adapter.onItemClick = { movie ->
+            val toast = Toast.makeText(
+                this,
+                movie.getName, Toast.LENGTH_SHORT
+            )
+            toast.show()
+        }
+
+        adapter.onLikeClick = { like, movie ->
+            if (like.drawable.constantState == resources.getDrawable(R.drawable.ic_heart_fill).constantState) {
+                like.setImageResource(R.drawable.ic_heart)
+                movie.isFavorites = false
+                getPreferences().remove(movie.getId)
+            } else {
+                like.setImageResource(R.drawable.ic_heart_fill)
+                movie.isFavorites = true
+                getPreferences().save(movie.getId)
+            }
+        }
     }
 
     private fun initializeData() {
@@ -65,21 +95,17 @@ class MainActivity : BaseActivity() {
     private fun addMovies() {
         repository.getMovies(object : ResponseCallback<MoviesResponse> {
             override fun onSuccess(apiResponse: MoviesResponse) {
-                if (page == 1)
-                    movies = ArrayList()
+                movies = ArrayList()
 
                 apiResponse.movies.forEach {
                     movies.add(
                         Movie(
                             it.id, it.name, it.description, Tools.convertDate(it.date),
-                            BASE_IMAGE_URL + it.imageURL, false
+                            BASE_IMAGE_URL + it.imageURL, getPreferences().isLiked(it.id)
                         )
                     )
                 }
-                if (page > 1) {
-                    rec_view_movie_card.adapter!!.notifyItemInserted(movies.size - 1)
-                } else
-                    setDataOnRecView(movies)
+                setDataOnRecView(movies)
                 isLoadData = false
                 isSearch = false
             }
@@ -88,8 +114,7 @@ class MainActivity : BaseActivity() {
                 isLoadData = false
                 visibleErrorLayout()
             }
-        }
-            , page)
+        })
     }
 
     private fun searchMovies() {
@@ -99,7 +124,7 @@ class MainActivity : BaseActivity() {
                     search_movies.add(
                         Movie(
                             it.id, it.name, it.description, Tools.convertDate(it.date),
-                            BASE_IMAGE_URL + it.imageURL, false
+                            BASE_IMAGE_URL + it.imageURL, getPreferences().isLiked(it.id)
                         )
                     )
                 }
@@ -112,6 +137,7 @@ class MainActivity : BaseActivity() {
             }
 
             override fun onFailure(errorMessage: String) {
+                isSearch = false
                 isLoadData = false
                 visibleErrorLayout()
             }
@@ -145,50 +171,21 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setDataOnRecView(data: ArrayList<Movie>) {
-        val adapter = MovieAdapter(data)
         val manager = LinearLayoutManager(this)
         rec_view_movie_card.layoutManager = manager
+
+        rec_view_movie_card.removeAllViews()
+        initializeAdapter(data)
         rec_view_movie_card.adapter = adapter
-
-        adapter.onItemClick = { movie ->
-            val toast = Toast.makeText(
-                this,
-                movie.getName, Toast.LENGTH_SHORT
-            )
-            toast.show()
-        }
-
-        initializeScrollListenerOnRecView(manager)
 
         invisibleProgress()
     }
 
-    private fun initializeScrollListenerOnRecView(manager: LinearLayoutManager) {
-        rec_view_movie_card.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                swipe_refresh_layout.isEnabled = !(recyclerView?.canScrollVertically(DIRECTION_UP))
-
-                val countVisible = manager.childCount
-                val countGeneral = manager.itemCount
-                val firstPosition = manager.findFirstVisibleItemPosition()
-
-                if (!isLoadData && !isSearch){
-                    if ((countVisible + firstPosition) >= countGeneral) {
-                        page++
-                        isLoadData = true
-                        addData()
-                    }
-                }
-            }
-        })
-    }
-
-    private fun addData(){
+    private fun addData() {
         if (isSearch)
-        searchMovies()
+            searchMovies()
         else
-        addMovies()
+            addMovies()
     }
 
     private fun initializeSearchEditText() {
@@ -213,7 +210,6 @@ class MainActivity : BaseActivity() {
             else
                 movies = ArrayList()
             visibleProgress()
-            page = 1
             isLoadData = true
             addData()
         }

@@ -10,10 +10,13 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.zkatemor.movies.R
 import com.zkatemor.movies.model.Movie
+import com.zkatemor.movies.util.getPreferences
+import com.zkatemor.movies.util.isLiked
 
 class MovieAdapter(private val items: ArrayList<Movie>) : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
 
     var onItemClick: ((Movie) -> Unit)? = null
+    var onLikeClick: ((ImageView, Movie) -> Unit)? = null
 
     override fun getItemCount(): Int {
         return items.size
@@ -39,6 +42,16 @@ class MovieAdapter(private val items: ArrayList<Movie>) : RecyclerView.Adapter<M
         else
             viewHolder.date.text = "дата неизвестна"
 
+        val iconLiked =
+            if (viewHolder.main_layout.context.getPreferences().isLiked(item.getId))
+                R.drawable.ic_heart_fill
+            else
+                R.drawable.ic_heart
+
+        item.isFavorites = iconLiked == R.drawable.ic_heart_fill
+
+        viewHolder.heart.setImageResource(iconLiked)
+
         Glide.with(viewHolder.main_layout).load(item.getImageURL).into(viewHolder.image)
     }
 
@@ -48,7 +61,7 @@ class MovieAdapter(private val items: ArrayList<Movie>) : RecyclerView.Adapter<M
         var description: TextView
         var date: TextView
         var image: ImageView
-        var icon_heart: ImageView
+        var heart: ImageView
 
         init {
             super.itemView
@@ -57,11 +70,16 @@ class MovieAdapter(private val items: ArrayList<Movie>) : RecyclerView.Adapter<M
             description = itemView.findViewById(R.id.movie_description) as TextView
             date = itemView.findViewById(R.id.text_date) as TextView
             image = itemView.findViewById(R.id.image_view_movie) as ImageView
-            icon_heart = itemView.findViewById(R.id.icon_heart) as ImageView
+            heart = itemView.findViewById(R.id.heart) as ImageView
 
             itemView.setOnClickListener {
                 onItemClick?.invoke(items[adapterPosition])
             }
+
+            heart.setOnClickListener{
+                onLikeClick!!(heart, items[adapterPosition])
+            }
+
         }
     }
 }

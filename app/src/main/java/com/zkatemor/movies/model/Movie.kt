@@ -8,7 +8,7 @@ class Movie : @Transient Serializable {
     private var description: String = ""
     private var date: String = ""
     private var imageURL: String = ""
-    private var isFavorites: Boolean = false
+    var isFavorites: Boolean = false
 
     constructor(
         id: Int,
@@ -40,7 +40,4 @@ class Movie : @Transient Serializable {
 
     val getImageURL: String
         get() = imageURL
-
-    val getIsFavorites: Boolean
-        get() = isFavorites
 }

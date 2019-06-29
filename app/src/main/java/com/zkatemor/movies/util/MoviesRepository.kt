@@ -9,9 +9,9 @@ import retrofit2.Response
 import javax.inject.Inject
 
 class MoviesRepository @Inject constructor(private val moviesApi: MoviesService) {
-    fun getMovies(responseCallback: ResponseCallback<MoviesResponse>, page: Int) {
+    fun getMovies(responseCallback: ResponseCallback<MoviesResponse>) {
         //retrofit async
-        moviesApi.getMovies(page)
+        moviesApi.getMovies()
             .enqueue(object : Callback<MoviesResponse> {
 
                 override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
