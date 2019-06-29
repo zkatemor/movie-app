@@ -5,6 +5,7 @@ import com.zkatemor.movies.network.BASE_SEARCH_URL
 import com.zkatemor.movies.network.BASE_URL
 import com.zkatemor.movies.network.MoviesService
 import com.zkatemor.movies.network.SearchService
+import com.zkatemor.movies.presenter.MainPresenter
 import com.zkatemor.movies.util.MoviesRepository
 import com.zkatemor.movies.util.SearchRepository
 import dagger.Module
@@ -17,7 +18,11 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
-class NetworkModule {
+class AppModule {
+    @Singleton
+    @Provides
+    fun providePresenter(): MainPresenter = MainPresenter()
+
     @Singleton
     @Provides
     fun buildHttpClient(): OkHttpClient {

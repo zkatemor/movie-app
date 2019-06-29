@@ -1,4 +1,4 @@
-package com.zkatemor.movies.model
+package com.zkatemor.movies.essence
 
 import java.io.Serializable
 
@@ -15,15 +15,13 @@ class Movie : @Transient Serializable {
         title: String,
         description: String,
         date: String,
-        imageURL: String,
-        isFavorites: Boolean
+        imageURL: String
     ) {
         this.id = id
         this.name = title
         this.description = description
         this.date = date
         this.imageURL = imageURL
-        this.isFavorites = isFavorites
     }
 
     val getId: Int

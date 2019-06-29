@@ -9,27 +9,22 @@ import android.view.View
 import com.zkatemor.movies.R
 import com.zkatemor.movies.adapter.MovieAdapter
 import com.zkatemor.movies.app.App
-import com.zkatemor.movies.model.Movie
-import com.zkatemor.movies.network.MoviesResponse
-import com.zkatemor.movies.network.ResponseCallback
+import com.zkatemor.movies.essence.Movie
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
-import javax.inject.Named
 import android.widget.Toast
+import com.zkatemor.movies.presenter.MainPresenter
 import com.zkatemor.movies.util.*
-import com.zkatemor.movies.util.Tools.Companion.buildImageURL
-import com.zkatemor.movies.util.Tools.Companion.convertDate
+import com.zkatemor.movies.view.MainView
 import kotlinx.android.synthetic.main.toolbar_main.*
 import java.io.Serializable
 
-class MainActivity : BaseActivity() {
+class MainActivity : BaseActivity(), MainView {
     @Inject
-    @Named("Movies_Repository")
-    lateinit var repository: MoviesRepository
+    lateinit var presenter: MainPresenter
 
-    @Inject
-    @Named("Search_Repository")
-    lateinit var search_repository: SearchRepository
+    private var movies: ArrayList<Movie> = ArrayList()
+    private var search_movies: ArrayList<Movie> = ArrayList()
 
     lateinit var adapter: MovieAdapter
     lateinit var manager: LinearLayoutManager
@@ -38,9 +33,6 @@ class MainActivity : BaseActivity() {
     private val DATA_KEY = "data"
     private val SEARCH_MOVIE = "search_movie"
 
-    private var movies: ArrayList<Movie> = ArrayList()
-    private var search_movies: ArrayList<Movie> = ArrayList()
-    private var isLoadData: Boolean = true
     private var isSearch: Boolean = false
     private var movie: String = ""
     private var position: Int = 0
@@ -52,12 +44,10 @@ class MainActivity : BaseActivity() {
 
         App.component!!.injectsMainActivity(this)
 
+        presenter.create(this)
         getData(savedInstanceState)
-
         initializeSwipeRefreshLayoutListener()
-
         setOnClickUpdateButton()
-
         initializeSearchEditText()
     }
 
@@ -73,7 +63,45 @@ class MainActivity : BaseActivity() {
         super.onSaveInstanceState(savedInstanceState)
     }
 
-    private fun getData(savedInstanceState: Bundle?){
+    override fun hasContent(): Boolean = (movies.size > 0 || search_movies.size > 0)
+
+    override fun showMainProgressBar() {
+        main_progress_bar.visibility = View.VISIBLE
+    }
+
+    override fun showErrorLayout() {
+        visibleErrorLayout()
+    }
+
+    override fun showFindEmpty(movie: String) {
+        visibleNotFoundLayout()
+    }
+
+    override fun showSwipeRefresh() {
+        swipe_refresh_layout.visibility = View.VISIBLE
+    }
+
+    override fun showMovies(data: ArrayList<Movie>) {
+        setDataOnRecView(data)
+        if (isSearch)
+            search_movies = data
+        else
+            movies = data
+    }
+
+    override fun showProgressBar() {
+        search_pbar.visibility = View.VISIBLE
+    }
+
+    override fun hideMainProgressBar() {
+        main_progress_bar.visibility = View.INVISIBLE
+    }
+
+    override fun hideProgressBar() {
+        search_pbar.visibility = View.INVISIBLE
+    }
+
+    private fun getData(savedInstanceState: Bundle?) {
         if (savedInstanceState == null)
             initializeData()
         else {
@@ -121,61 +149,7 @@ class MainActivity : BaseActivity() {
         invisibleNotFoundLayout()
         invisibleErrorLayout()
         visibleProgress()
-        isLoadData = true
         addData()
-    }
-
-    private fun addMovies() {
-        repository.getMovies(object : ResponseCallback<MoviesResponse> {
-            override fun onSuccess(apiResponse: MoviesResponse) {
-                movies = ArrayList()
-
-                apiResponse.movies.forEach {
-                    movies.add(
-                        Movie(
-                            it.id, it.name, it.description, convertDate(it.date),
-                            buildImageURL(it.imageURL), getPreferences().isLiked(it.id)
-                        )
-                    )
-                }
-                setDataOnRecView(movies)
-                isLoadData = false
-                isSearch = false
-            }
-
-            override fun onFailure(errorMessage: String) {
-                isLoadData = false
-                visibleErrorLayout()
-            }
-        })
-    }
-
-    private fun searchMovies() {
-        search_repository.searchMovies(object : ResponseCallback<MoviesResponse> {
-            override fun onSuccess(apiResponse: MoviesResponse) {
-                apiResponse.movies.forEach {
-                    search_movies.add(
-                        Movie(
-                            it.id, it.name, it.description, convertDate(it.date),
-                            buildImageURL(it.imageURL), getPreferences().isLiked(it.id)
-                        )
-                    )
-                }
-                if (search_movies.count() >= 1) {
-                    setDataOnRecView(search_movies)
-                    isLoadData = false
-                } else {
-                    visibleNotFoundLayout()
-                }
-            }
-
-            override fun onFailure(errorMessage: String) {
-                isSearch = false
-                isLoadData = false
-                visibleErrorLayout()
-            }
-        }
-            , movie)
     }
 
     private fun visibleErrorLayout() {
@@ -215,9 +189,9 @@ class MainActivity : BaseActivity() {
 
     private fun addData() {
         if (isSearch)
-            searchMovies()
+            presenter.searchMovies(movie)
         else
-            addMovies()
+            presenter.addMovies()
     }
 
     private fun initializeSearchEditText() {
@@ -241,9 +215,7 @@ class MainActivity : BaseActivity() {
                 search_movies = ArrayList()
             else
                 movies = ArrayList()
-            visibleProgress()
-            isLoadData = true
-            addData()
+            presenter.updateMovies(isSearch, movie)
         }
     }
 

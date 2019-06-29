@@ -27,13 +27,8 @@ open class BaseActivity : AppCompatActivity(), ConnectivityReceiver.Connectivity
     }
 
     override fun onResume() {
+        ConnectivityReceiver.connectivityReceiverListener = this
         super.onResume()
-        ConnectivityReceiver.connectivityReceiverListener = this
-    }
-
-    override fun onPause() {
-        super.onPause()
-        ConnectivityReceiver.connectivityReceiverListener = this
     }
 
     override fun onNetworkConnectionChanged(isConnected: Boolean) {

@@ -15,7 +15,7 @@ class SearchRepository @Inject constructor(private val searchApi: SearchService)
             .enqueue(object : Callback<MoviesResponse> {
 
                 override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
-                    responseCallback.onFailure("Getting movies error")
+                    responseCallback.onFailure()
                 }
 
                 override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
@@ -24,7 +24,7 @@ class SearchRepository @Inject constructor(private val searchApi: SearchService)
                     if (moviesResponse != null) {
                         responseCallback.onSuccess(moviesResponse)
                     } else {
-                        responseCallback.onFailure("Getting movies error")
+                        responseCallback.onFailure()
                     }
                 }
             })

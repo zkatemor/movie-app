@@ -9,7 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.zkatemor.movies.R
-import com.zkatemor.movies.model.Movie
+import com.zkatemor.movies.essence.Movie
 import com.zkatemor.movies.util.getPreferences
 import com.zkatemor.movies.util.isLiked
 
