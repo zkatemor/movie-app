@@ -26,5 +26,9 @@ class Tools {
 
             return result
         }
+
+        fun buildImageURL(url: String?): String{
+            return "https://image.tmdb.org/t/p/w500/" + url
+        }
     }
 }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.support.v7.app.AppCompatActivity
 import com.zkatemor.movies.util.ConnectivityReceiver
 import com.zkatemor.movies.util.SnackBar
@@ -15,8 +16,7 @@ open class BaseActivity : AppCompatActivity(), ConnectivityReceiver.Connectivity
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         registerReceiver(ConnectivityReceiver(),
-            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        )
+            IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
     }
 
     private fun showMessage(isConnected: Boolean) {
@@ -28,6 +28,11 @@ open class BaseActivity : AppCompatActivity(), ConnectivityReceiver.Connectivity
 
     override fun onResume() {
         super.onResume()
+        ConnectivityReceiver.connectivityReceiverListener = this
+    }
+
+    override fun onPause() {
+        super.onPause()
         ConnectivityReceiver.connectivityReceiverListener = this
     }
 

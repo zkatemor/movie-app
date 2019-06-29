@@ -1,7 +1,9 @@
 package com.zkatemor.movies.activity
 
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.KeyEvent
 import android.view.View
 import com.zkatemor.movies.R
@@ -15,6 +17,8 @@ import javax.inject.Inject
 import javax.inject.Named
 import android.widget.Toast
 import com.zkatemor.movies.util.*
+import com.zkatemor.movies.util.Tools.Companion.buildImageURL
+import com.zkatemor.movies.util.Tools.Companion.convertDate
 import kotlinx.android.synthetic.main.toolbar_main.*
 import java.io.Serializable
 
@@ -28,37 +32,66 @@ class MainActivity : BaseActivity() {
     lateinit var search_repository: SearchRepository
 
     lateinit var adapter: MovieAdapter
-
-    private val BASE_IMAGE_URL: String = "https://image.tmdb.org/t/p/w500/"
-    private val MOVIES_KEY = "movies"
+    lateinit var manager: LinearLayoutManager
+    private val RECYCLER_POSITION_KEY = "recycler_position"
+    private val SEARCH_FLAG_KEY = "is_search"
+    private val DATA_KEY = "data"
+    private val SEARCH_MOVIE = "search_movie"
 
     private var movies: ArrayList<Movie> = ArrayList()
     private var search_movies: ArrayList<Movie> = ArrayList()
     private var isLoadData: Boolean = true
     private var isSearch: Boolean = false
     private var movie: String = ""
+    private var position: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        manager = LinearLayoutManager(this)
 
         App.component!!.injectsMainActivity(this)
 
-        initializeData()
+        getData(savedInstanceState)
 
         initializeSwipeRefreshLayoutListener()
 
         setOnClickUpdateButton()
 
         initializeSearchEditText()
-
-        initializeData()
     }
 
     public override fun onSaveInstanceState(savedInstanceState: Bundle) {
         savedInstanceState.clear()
-        savedInstanceState.putSerializable(MOVIES_KEY, movies as Serializable)
+        if (!isSearch)
+            savedInstanceState.putSerializable(DATA_KEY, movies as Serializable)
+        else
+            savedInstanceState.putSerializable(DATA_KEY, search_movies as Serializable)
+        savedInstanceState.putInt(RECYCLER_POSITION_KEY, manager.findFirstCompletelyVisibleItemPosition())
+        savedInstanceState.putBoolean(SEARCH_FLAG_KEY, isSearch)
+        savedInstanceState.putString(SEARCH_MOVIE, movie)
         super.onSaveInstanceState(savedInstanceState)
+    }
+
+    private fun getData(savedInstanceState: Bundle?){
+        if (savedInstanceState == null)
+            initializeData()
+        else {
+            val data = savedInstanceState.getSerializable(DATA_KEY) as ArrayList<Movie>
+            position = savedInstanceState.getInt(RECYCLER_POSITION_KEY)
+            isSearch = savedInstanceState.getBoolean(SEARCH_FLAG_KEY)
+            movie = savedInstanceState.getString(SEARCH_MOVIE)
+
+            if (isSearch)
+                search_movies = data
+            else movies = data
+
+            if (position == RecyclerView.NO_POSITION)
+                position = 0
+
+            setDataOnRecView(data)
+            rec_view_movie_card.smoothScrollToPosition(position)
+        }
     }
 
     private fun initializeAdapter(data: ArrayList<Movie>) {
@@ -100,8 +133,8 @@ class MainActivity : BaseActivity() {
                 apiResponse.movies.forEach {
                     movies.add(
                         Movie(
-                            it.id, it.name, it.description, Tools.convertDate(it.date),
-                            BASE_IMAGE_URL + it.imageURL, getPreferences().isLiked(it.id)
+                            it.id, it.name, it.description, convertDate(it.date),
+                            buildImageURL(it.imageURL), getPreferences().isLiked(it.id)
                         )
                     )
                 }
@@ -123,8 +156,8 @@ class MainActivity : BaseActivity() {
                 apiResponse.movies.forEach {
                     search_movies.add(
                         Movie(
-                            it.id, it.name, it.description, Tools.convertDate(it.date),
-                            BASE_IMAGE_URL + it.imageURL, getPreferences().isLiked(it.id)
+                            it.id, it.name, it.description, convertDate(it.date),
+                            buildImageURL(it.imageURL), getPreferences().isLiked(it.id)
                         )
                     )
                 }
@@ -171,7 +204,6 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setDataOnRecView(data: ArrayList<Movie>) {
-        val manager = LinearLayoutManager(this)
         rec_view_movie_card.layoutManager = manager
 
         rec_view_movie_card.removeAllViews()

@@ -32,7 +32,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
-                android:cursorVisible="false"
                 android:layout_gravity="center"
                 android:fontFamily="sans-serif"
                 android:inputType="textCapWords"
