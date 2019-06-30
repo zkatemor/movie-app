@@ -65,10 +65,6 @@ class MainActivity : AppCompatActivity(), MainView {
 
     override fun hasContent(): Boolean = (movies.size > 0 || search_movies.size > 0)
 
-    override fun showMainProgressBar() {
-        main_progress_bar.visibility = View.VISIBLE
-    }
-
     override fun showErrorLayout() {
         visibleErrorLayout()
     }
@@ -90,19 +86,15 @@ class MainActivity : AppCompatActivity(), MainView {
     }
 
     override fun showProgressBar() {
-        search_pbar.visibility = View.VISIBLE
-    }
-
-    override fun hideMainProgressBar() {
-        main_progress_bar.visibility = View.INVISIBLE
+        visibleProgress()
     }
 
     override fun hideProgressBar() {
-        search_pbar.visibility = View.INVISIBLE
+        invisibleProgress()
     }
 
     override fun showConnectivityError() {
-        invisibleProgress()
+        hideProgressBar()
         val error_snackbar = SnackBar(main_layout)
         error_snackbar.show(this)
     }
@@ -154,18 +146,18 @@ class MainActivity : AppCompatActivity(), MainView {
     private fun initializeData() {
         invisibleNotFoundLayout()
         invisibleErrorLayout()
-        visibleProgress()
+        showProgressBar()
         addData()
     }
 
     private fun visibleErrorLayout() {
         error_layout.visibility = View.VISIBLE
         linear_layout.visibility = View.INVISIBLE
-        invisibleProgress()
+        hideProgressBar()
     }
 
     private fun invisibleErrorLayout() {
-        invisibleProgress()
+        hideProgressBar()
         linear_layout.visibility = View.VISIBLE
         error_layout.visibility = View.INVISIBLE
     }
@@ -174,13 +166,26 @@ class MainActivity : AppCompatActivity(), MainView {
         not_found_layout.visibility = View.VISIBLE
         linear_layout.visibility = View.INVISIBLE
         not_found_text_view.text = "По запросу “" + movie + "” ничего не найдено"
-        invisibleProgress()
+        hideProgressBar()
     }
 
     private fun invisibleNotFoundLayout() {
-        invisibleProgress()
+        hideProgressBar()
         linear_layout.visibility = View.VISIBLE
         not_found_layout.visibility = View.INVISIBLE
+    }
+
+    private fun invisibleProgress() {
+        swipe_refresh_layout.isRefreshing = false
+        search_pbar.visibility = View.INVISIBLE
+        main_progress_bar.visibility = View.INVISIBLE
+    }
+
+    private fun visibleProgress() {
+        if (hasContent())
+            search_pbar.visibility = View.VISIBLE
+        else
+            main_progress_bar.visibility = View.VISIBLE
     }
 
     private fun setDataOnRecView(data: ArrayList<Movie>) {
@@ -190,7 +195,7 @@ class MainActivity : AppCompatActivity(), MainView {
         initializeAdapter(data)
         rec_view_movie_card.adapter = adapter
 
-        invisibleProgress()
+        hideProgressBar()
     }
 
     private fun addData() {
@@ -210,7 +215,8 @@ class MainActivity : AppCompatActivity(), MainView {
                 isSearch = true
                 initializeData()
                 return@OnKeyListener true
-            }
+            } else if (keyCode == KeyEvent.KEYCODE_BACK)
+                search_bar_edit_text.text.clear()
             false
         })
     }
@@ -227,22 +233,9 @@ class MainActivity : AppCompatActivity(), MainView {
 
     private fun setOnClickUpdateButton() {
         update_image_view.setOnClickListener {
-            visibleProgress()
+            showProgressBar()
             initializeData()
         }
-    }
-
-    private fun invisibleProgress() {
-        swipe_refresh_layout.isRefreshing = false
-        search_pbar.visibility = View.INVISIBLE
-        main_progress_bar.visibility = View.INVISIBLE
-    }
-
-    private fun visibleProgress() {
-        if (movies.count() >= 1 || search_movies.count() >= 1)
-            search_pbar.visibility = View.VISIBLE
-        else
-            main_progress_bar.visibility = View.VISIBLE
     }
 
     override fun onBackPressed() {
@@ -250,8 +243,9 @@ class MainActivity : AppCompatActivity(), MainView {
             isSearch = false
             movie = ""
             search_bar_edit_text.text.clear()
-            visibleProgress()
-            setDataOnRecView(movies)
+            search_movies = ArrayList()
+            movies = ArrayList()
+            initializeData()
         } else
             super.onBackPressed()
     }

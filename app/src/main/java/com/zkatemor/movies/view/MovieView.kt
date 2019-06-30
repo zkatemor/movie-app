@@ -8,7 +8,7 @@ import com.zkatemor.movies.essence.Movie
 interface MovieView {
     fun showMovies(data: ArrayList<Movie>)
     fun showErrorLayout()
-    fun showMainProgressBar()
-    fun hideMainProgressBar()
+    fun showProgressBar()
+    fun hideProgressBar()
     fun showSwipeRefresh()
 }

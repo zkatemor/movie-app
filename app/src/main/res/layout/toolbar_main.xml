@@ -36,6 +36,8 @@
                 android:fontFamily="sans-serif"
                 android:inputType="textCapWords"
                 android:selectAllOnFocus="false"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:imeOptions="actionSearch"
                 android:background="@null"
                 android:textColorHint="@color/colorBlack__38"

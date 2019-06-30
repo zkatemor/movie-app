@@ -89,11 +89,7 @@ class MainPresenter : LoadData {
      * отобразить состояние прогрузки данных
      */
     private fun showProgress(dataLoadStatus: DataLoadStatus) {
-        when (dataLoadStatus) {
-            DataLoadStatus.Loading -> main_view!!.showMainProgressBar()
-            DataLoadStatus.Searching -> main_view!!.showProgressBar()
-            else -> return
-        }
+        main_view!!.showProgressBar()
     }
 
     /**
@@ -101,8 +97,7 @@ class MainPresenter : LoadData {
      */
     private fun hideProgress(dataLoadStatus: DataLoadStatus) {
         when (dataLoadStatus) {
-            DataLoadStatus.Loading -> main_view!!.hideMainProgressBar()
-            DataLoadStatus.Searching -> main_view!!.hideProgressBar()
+            DataLoadStatus.Loading, DataLoadStatus.Searching -> main_view!!.hideProgressBar()
             DataLoadStatus.Refreshing -> main_view!!.showSwipeRefresh()
         }
     }
