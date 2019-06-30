@@ -13,6 +13,9 @@ import com.zkatemor.movies.essence.Movie
 import com.zkatemor.movies.util.getPreferences
 import com.zkatemor.movies.util.isLiked
 
+/**
+ * адаптер для просмотра списка фильмов
+ */
 class MovieAdapter(private val items: ArrayList<Movie>) : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
 
     var onItemClick: ((Movie) -> Unit)? = null

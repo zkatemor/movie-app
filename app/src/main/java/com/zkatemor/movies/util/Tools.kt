@@ -2,6 +2,9 @@ package com.zkatemor.movies.util
 
 import java.text.DateFormatSymbols
 
+/**
+ * преобразование данных в нужный формат
+ */
 class Tools {
     companion object {
         fun convertDate(sDate: String?): String {

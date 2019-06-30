@@ -22,6 +22,9 @@ class MainModel(private val presenter: MainPresenter): Model {
         App.component!!.injectsMainModel(this)
     }
 
+    /**
+     * запрос данных на главный экран
+     */
     override fun addAllMovies(dataLoadStatus: MainPresenter.DataLoadStatus) {
         repository.getMovies(object : ResponseCallback<MoviesResponse> {
             override fun onSuccess(apiResponse: MoviesResponse) {
@@ -41,8 +44,11 @@ class MainModel(private val presenter: MainPresenter): Model {
         })
     }
 
-    override fun searchMovies(movie: String) {
-        val dataLoadStatus = MainPresenter.DataLoadStatus.Searching
+    /**
+     * запрос данных на экран с поисковым запросом
+     */
+    override fun searchMovies(movie: String, dataLoadStatus: MainPresenter.DataLoadStatus) {
+       // val dataLoadStatus = MainPresenter.DataLoadStatus.Searching
         val search_movies = ArrayList<Movie>()
 
         search_repository.searchMovies(object : ResponseCallback<MoviesResponse> {

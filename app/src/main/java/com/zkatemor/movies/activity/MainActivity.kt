@@ -250,7 +250,8 @@ class MainActivity : AppCompatActivity(), MainView {
             isSearch = false
             movie = ""
             search_bar_edit_text.text.clear()
-            initializeData()
+            visibleProgress()
+            setDataOnRecView(movies)
         } else
             super.onBackPressed()
     }

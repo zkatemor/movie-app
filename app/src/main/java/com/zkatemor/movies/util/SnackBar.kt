@@ -7,6 +7,9 @@ import android.view.View
 import android.widget.TextView
 import com.zkatemor.movies.R
 
+/**
+ * описание SnackBar для отображения ошибки подключения к интернету
+ */
 class SnackBar(v: View){
     private val snackbar: Snackbar
     private val snackbar_view: View
