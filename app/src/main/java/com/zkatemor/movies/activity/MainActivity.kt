@@ -19,7 +19,7 @@ import com.zkatemor.movies.view.MainView
 import kotlinx.android.synthetic.main.toolbar_main.*
 import java.io.Serializable
 
-class MainActivity : BaseActivity(), MainView {
+class MainActivity : AppCompatActivity(), MainView {
     @Inject
     lateinit var presenter: MainPresenter
 
@@ -99,6 +99,12 @@ class MainActivity : BaseActivity(), MainView {
 
     override fun hideProgressBar() {
         search_pbar.visibility = View.INVISIBLE
+    }
+
+    override fun showConnectivityError() {
+        invisibleProgress()
+        val error_snackbar = SnackBar(main_layout)
+        error_snackbar.show(this)
     }
 
     private fun getData(savedInstanceState: Bundle?) {
@@ -221,8 +227,8 @@ class MainActivity : BaseActivity(), MainView {
 
     private fun setOnClickUpdateButton() {
         update_image_view.setOnClickListener {
+            visibleProgress()
             initializeData()
-            invisibleProgress()
         }
     }
 

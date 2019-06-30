@@ -22,7 +22,15 @@ class MainPresenter : LoadData {
 
     override fun onFailure(dataLoadStatus: DataLoadStatus) {
         hideProgress(dataLoadStatus)
-        main_view!!.showErrorLayout()
+
+        when (dataLoadStatus) {
+            DataLoadStatus.Loading, DataLoadStatus.Searching -> {
+                if (!main_view!!.hasContent())
+                    main_view!!.showErrorLayout()
+                else main_view!!.showConnectivityError()
+            }
+            DataLoadStatus.Refreshing -> main_view!!.showConnectivityError()
+        }
     }
 
     override fun onSuccess(movies: ArrayList<Movie>, dataLoadStatus: DataLoadStatus) {
